@@ -1,10 +1,38 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<div class="post-entry">
-<h2>{{ post.title }}</h2>
-<p>{{ post.body }}</p>
-</div>
 
-<a href="{% url 'blog:post_edit' post.slug %}">Edit Post</a> |
-<a href="{% url 'blog:post_delete' post.slug %}">Delete Post</a>
-{% endblock content %}
+		<article class="blog-post px-3 py-5 p-md-5">
+		    <div class="container">
+			    <header class="blog-post-header">
+				    <h2 class="title mb-2">{{ post.title }}</h2>
+				    <div class="meta mb-3"><span class="date">Published {{ post.publish }}</span><span class="time">Updated {{ post.updated }}</span><span class="comment"><a href="#">8 comments</a></span></div>
+			    </header>
+			    
+			    <div class="blog-post-body">
+				    <figure class="blog-banner">
+				        <img class="img-fluid" src="{% static 'assets/images/blog/blog-post-banner.jpg' %}" alt="image">
+				        <figcaption class="mt-2 text-center image-caption"><a href="" target="_blank"></a></figcaption>
+				    </figure>
+					<a href="{% url 'blog:post_edit' post.slug %}">Edit Post</a> |
+					<a href="{% url 'blog:post_delete' post.slug %}">Delete Post</a>
+					
+				    <p>
+
+					</p>
+					
+			    </div>
+				    
+			    <nav class="blog-nav nav nav-justified my-5">
+				  <a class="nav-link-prev nav-item nav-link rounded-left" href="#">Previous<i class="arrow-prev fas fa-long-arrow-alt-left"></i></a>
+				  <a class="nav-link-next nav-item nav-link rounded-right" href="#">Next<i class="arrow-next fas fa-long-arrow-alt-right"></i></a>
+				</nav>
+				
+				<div class="blog-comments-section">
+
+				</div><!--//blog-comments-section-->
+				
+		    </div><!--//container-->
+	    </article>
+
+{% endblock content %} 

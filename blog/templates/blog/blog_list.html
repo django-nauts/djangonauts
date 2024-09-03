@@ -1,8 +1,31 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
 {% block content %}
-{% for post in post_list %}
-<div class="post-entry">
-<h2><a href="{% url 'blog:blog_detail' slug=post.slug %}">{{ post.title }}</a></h2>
-</div>
-{% endfor %}
-{% endblock content %}
+
+		<a href="{% url 'blog:post_new' %}">New Post</a>
+	    <section class="blog-list px-3 py-5 p-md-5">
+		    <div class="container">
+
+			  {% for post in post_list %}
+			    <div class="item mb-5">
+				    <div class="media">
+					  <a href="{% url 'blog:blog_detail' slug=post.slug %}"><img class="mr-3 img-fluid post-thumb d-none d-md-flex" src="{% static 'assets/images/blog/blog-post-thumb-1.jpg' %}" alt="image"></a>
+					    <div class="media-body">
+						    <h3 class="title mb-1"><a href="{% url 'blog:blog_detail' slug=post.slug %}">{{ post.title }}</a></h3>
+						    <div class="meta mb-1"><span class="date">Published {{ post.publish }}</span><span class="time">Updated {{ post.updated }}</span></div>
+						    <div class="intro">{{ post.body }}</div>
+						    <a class="more-link" href="{% url 'blog:blog_detail' slug=post.slug %}">Read more &rarr;</a>
+					    </div><!--//media-body-->
+				    </div><!--//media-->
+			    </div><!--//item-->
+				{% endfor %}
+			    
+			    <nav class="blog-nav nav nav-justified my-5">
+				  <a class="nav-link-prev nav-item nav-link rounded-left" href="#">Previous<i class="arrow-prev fas fa-long-arrow-alt-left"></i></a>
+				  <a class="nav-link-next nav-item nav-link rounded-right" href="#">Next<i class="arrow-next fas fa-long-arrow-alt-right"></i></a>
+				</nav>
+				
+		    </div>
+	    </section>
+
+{% endblock content %} 
