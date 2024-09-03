@@ -63,16 +63,19 @@
 		</nav>
 		
         {% if user.is_authenticated %}
+		{% if user.is_staff %}
         <form action="{% url 'logout' %}" method="post">
-          {% csrf_token %}
-          <button type="submit">Log Out</button>
+          {% csrf_token %}		  
+          <button style="border:none;background:none;color: white;" type="submit">Log Out</button> |
+		  <a style="color: white;" href="{% url 'blog:post_new' %}">New Post</a>
         </form>
         {% else %}
-        <a href="{% url 'login' %}">Log In</a> |
-        <a href="{% url 'signup' %}">Sign Up</a> |
-        {% endif %}
+		<a style="color: white;" href="{% url 'signup' %}">Sign Up</a> |
+        <a style="color: white;" href="{% url 'login' %}">Log In</a>
+		{% endif %}
+        {% endif %}		
 		
-		<a href="{% url 'blog:post_new' %}">New Post</a>
+
     </header>
 
     <div class="main-wrapper">

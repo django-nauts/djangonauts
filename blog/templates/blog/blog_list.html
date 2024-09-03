@@ -8,7 +8,7 @@
 			  {% for post in post_list %}
 			    <div class="item mb-5">
 				    <div class="media">
-					  <a href="{% url 'blog:blog_detail' slug=post.slug %}"><img class="mr-3 img-fluid post-thumb d-none d-md-flex" src="{% static 'assets/images/blog/blog-post-thumb-1.jpg' %}" alt="image"></a>
+					  <a href="{% url 'blog:blog_detail' slug=post.slug %}"><img class="mr-3 img-fluid post-thumb d-none d-md-flex" src="{{ post.cover.url }}" alt="image"></a>
 					    <div class="media-body">
 						    <h3 class="title mb-1"><a href="{% url 'blog:blog_detail' slug=post.slug %}">{{ post.title }}</a></h3>
 						    <div class="meta mb-1"><span class="date">Published {{ post.publish }}</span><span class="time">Updated {{ post.updated }}</span></div>

@@ -11,11 +11,13 @@
 			    
 			    <div class="blog-post-body">
 				    <figure class="blog-banner">
-				        <img class="img-fluid" src="{% static 'assets/images/blog/blog-post-banner.jpg' %}" alt="image">
+				        <img class="img-fluid" src="{{ post.cover.url }}" alt="image">
 				        <figcaption class="mt-2 text-center image-caption"><a href="" target="_blank"></a></figcaption>
 				    </figure>
+					{% if user.is_staff %}
 					<a href="{% url 'blog:post_edit' post.slug %}">Edit Post</a> |
 					<a href="{% url 'blog:post_delete' post.slug %}">Delete Post</a>
+					{% endif %}
 					
 				    <p>
 
