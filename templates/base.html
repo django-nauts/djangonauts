@@ -61,6 +61,18 @@
 				</div>
 			</div>
 		</nav>
+		
+        {% if user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit">Log Out</button>
+        </form>
+        {% else %}
+        <a href="{% url 'login' %}">Log In</a> |
+        <a href="{% url 'signup' %}">Sign Up</a> |
+        {% endif %}
+		
+		<a href="{% url 'blog:post_new' %}">New Post</a>
     </header>
 
     <div class="main-wrapper">

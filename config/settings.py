@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
 	# Internal apps
 	'blog.apps.BlogConfig',
+	'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -128,3 +129,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = "blog:blog_list"
+LOGOUT_REDIRECT_URL = "blog:blog_list"
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
