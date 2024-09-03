@@ -12,11 +12,21 @@ from .models import Post
 class BlogList(ListView):
     model = Post
     template_name = "blog/blog_list.html"
+    paginate_by = 5
 
 
 class BlogDetail(DetailView):
     model = Post
     template_name = "blog/blog_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.object
+
+        context['previous_post'] = Post.objects.filter(publish__lt=post.publish).order_by('-updated').first()
+        context['next_post'] = Post.objects.filter(publish__gt=post.publish).order_by('updated').first()
+
+        return context
 
 
 class BlogCreate(LoginRequiredMixin, CreateView):
