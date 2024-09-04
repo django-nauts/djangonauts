@@ -19,6 +19,7 @@
     
     <!-- Theme CSS -->  
     <link id="theme-style" rel="stylesheet" href="{% static 'assets/css/theme-1.css' %}">
+    <link id="theme-style" rel="stylesheet" href="{% static 'assets/css/new.css' %}">
 
 </head>
 
@@ -62,18 +63,19 @@
 			</div>
 		</nav>
 		
-        {% if user.is_authenticated %}
-		{% if user.is_staff %}
+{% if user.is_authenticated %}
+    {% if user.is_staff %}
         <form action="{% url 'logout' %}" method="post">
-          {% csrf_token %}		  
-          <button style="border:none;background:none;color: white;" type="submit">Log Out</button> |
-		  <a style="color: white;" href="{% url 'blog:post_new' %}">New Post</a>
+            {% csrf_token %}
+            <button class="logout-button" type="submit">Log Out</button>|
+            <a style="color: white;" href="{% url 'blog:post_new' %}">New Post</a>
         </form>
-        {% else %}
-		<a style="color: white;" href="{% url 'signup' %}">Sign Up</a> |
+    {% else %}
+        <a style="color: white;" href="{% url 'signup' %}">Sign Up</a> |
         <a style="color: white;" href="{% url 'login' %}">Log In</a>
-		{% endif %}
-        {% endif %}		
+    {% endif %}
+{% endif %}
+
 		
 
     </header>

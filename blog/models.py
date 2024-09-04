@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.conf import settings
 
+from taggit.managers import TaggableManager
+
 
 class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -11,6 +13,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200, blank=False, null=False)
     slug = models.SlugField(blank=False, null=False, unique=True)
     body = models.TextField(blank=False, null=False)
+    tags = TaggableManager(blank=True)
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -18,7 +21,7 @@ class Post(models.Model):
     class Meta:
         ordering = ['-updated']
         indexes = [
-            models.Index(fields=['-publish']),
+            models.Index(fields=['-updated']),
         ]
 
     def __str__(self):

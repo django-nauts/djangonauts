@@ -41,6 +41,9 @@ INSTALLED_APPS = [
 	# Internal apps
 	'blog.apps.BlogConfig',
 	'accounts.apps.AccountsConfig',
+
+	# External apps
+	'taggit',
 ]
 
 MIDDLEWARE = [
