@@ -41,3 +41,10 @@
 .pagination-info:hover {
     background-color: #e0e0e0;
 }
+
+.reply-date {
+    font-size: 10px; /* Adjust the font size */
+    margin-top: 2px; /* Adjust the top margin for spacing */
+    margin-bottom: 2px; /* Adjust the bottom margin for spacing */
+    color: #888; /* Optional: Change the color to a lighter shade */
+}

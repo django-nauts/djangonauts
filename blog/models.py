@@ -34,3 +34,17 @@ class Post(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         return super().save(*args, **kwargs)
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    author = models.CharField(max_length=100)
+    comment = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+
+    def __str__(self):
+        return f'Comment by ({self.author}) on ({self.post.title})'
+
+    def get_absolute_url(self):
+        return reverse("blog:blog_detail")

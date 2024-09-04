@@ -8,12 +8,12 @@
 			  {% for post in post_list %}
 			    <div class="item mb-5">
 				    <div class="media">
-					  <a href="{% url 'blog:blog_detail' slug=post.slug %}"><img class="mr-3 img-fluid post-thumb d-none d-md-flex" src="{{ post.cover.url }}" alt="image"></a>
+					  <a href="{{ post.get_absolute_url }}"><img class="mr-3 img-fluid post-thumb d-none d-md-flex" src="{{ post.cover.url }}" alt="image"></a>
 					    <div class="media-body">
-						    <h3 class="title mb-1"><a href="{% url 'blog:blog_detail' slug=post.slug %}">{{ post.title | slice:"50" }}</a></h3>
+						    <h3 class="title mb-1"><a href="{{ post.get_absolute_url }}">{{ post.title | slice:"50" }}</a></h3>
 						    <div class="meta mb-1"><span class="date">Published {{ post.publish }}</span><span class="time">Updated {{ post.updated }}</span></div>
 						    <div class="intro">{{ post.body | slice:"300" }}...</div>
-						    <a class="more-link" href="{% url 'blog:blog_detail' slug=post.slug %}">Read more &rarr;</a>
+						    <a class="more-link" href="{{ post.get_absolute_url }}">Read more &rarr;</a>
 					    </div><!--//media-body-->
 				    </div><!--//media-->
 			    </div><!--//item-->
