@@ -15,7 +15,7 @@
     display: inline-block;
     margin: 5px;
     text-decoration: none;
-    color: #27AE60;
+    color: #333;
     transition: all 0.3s ease;
 }
 
@@ -51,7 +51,7 @@
 }
 
 .comments-list {
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 .comment {
@@ -87,7 +87,7 @@ textarea {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: #1FaF50;
     color: white;
     padding: 10px 15px;
     border: none;

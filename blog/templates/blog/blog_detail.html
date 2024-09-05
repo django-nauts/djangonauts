@@ -77,7 +77,7 @@
                         <div class="reply">
                             <h5>{{ reply.author }}</h5>
                             <p>{{ reply.comment }}</p>
-                            <span class="reply-date">{{ reply.created_at|date:"F j, Y, g:i a" }}</span>
+                            <span class="reply-date comment-date">{{ reply.created_at|date:"F j, Y, g:i a" }}</span>
                         </div>
                     {% empty %}
                         <p>No replies yet.</p>

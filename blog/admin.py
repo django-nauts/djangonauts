@@ -17,3 +17,5 @@ class PostAdmin(admin.ModelAdmin):
     date_hierarchy = 'publish'
     ordering = ['-updated']
     inlines = [CommentInline]
+
+admin.site.register(Comment)
