@@ -7,6 +7,8 @@ from .views import (
 	BlogDelete,
 	BlogCategory,
 	AboutPage,
+	CommentUpdate,
+	CommentDelete
 )
 
 app_name = 'blog'
@@ -20,4 +22,6 @@ urlpatterns = [
 	path("post/<slug:slug>/delete/", BlogDelete.as_view(), name="post_delete"),
 	path('post/<slug:tag_slug>/', BlogCategory.as_view(), name='blog_category'),
 	path("about/", AboutPage.as_view(), name="about"),
+    path('comment/<int:pk>/edit/', CommentUpdate.as_view(), name='comment_edit'),
+    path('comment/<int:pk>/delete/', CommentDelete.as_view(), name='comment_delete'),	
 ]

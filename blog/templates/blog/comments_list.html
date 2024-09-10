@@ -1,0 +1,57 @@
+<div class="comments-list" id="comments-list">
+    {% for comment in comments %}
+        <div class="comment">
+            <h4>{{ comment.author.username }}</h4>
+            <img src="{{ comment.author.profile.profile_image.url }}" alt="{{ comment.author.username }}'s profile image">
+            <p>{{ comment.comment }}</p>
+            <span class="comment-date">{{ comment.created_at|date:"F j, Y, g:i a" }}</span>
+            
+            {% if comment.author == request.user %}
+                <a href="{% url 'blog:comment_edit' comment.id %}" class="btn btn-edit">Edit</a>
+                <form action="{% url 'blog:comment_delete' comment.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-delete">Delete</button>
+                </form>
+            {% endif %}
+            
+            <button class="reply-button btn-green" data-comment-id="{{ comment.id }}">Reply</button>
+            <div class="reply-form" id="reply-form-{{ comment.id }}" style="display:none;">
+                <form class="reply-form" data-parent-id="{{ comment.id }}" action="{% url 'blog:blog_detail' slug=post.slug %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="reply-comment">Your Reply:</label>
+                        <textarea id="reply-comment" name="comment" rows="4" required class="form-control"></textarea>
+                    </div>
+                    <input type="hidden" name="parent" value="{{ comment.id }}">
+                    <button type="submit" class="btn-green">Submit Reply</button>
+                </form>
+            </div>
+
+            <div class="replies">
+                {% for reply in comment.replies.all|slice:":10" %}
+                    <div class="reply">
+                        <h5>{{ reply.author }}</h5>
+                        <img src="{{ reply.profile_image.url }}" alt="{{ reply.author }}'s profile image" class="profile-image">
+                        <p>{{ reply.comment }}</p>
+                        <span class="reply-date comment-date">{{ reply.created_at|date:"F j, Y, g:i a" }}</span>
+                        
+                        {% if reply.author == request.user %}
+                            <a href="{% url 'blog:comment_edit' reply.id %}" class="btn btn-edit">Edit</a>
+                            <form action="{% url 'blog:comment_delete' reply.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-delete">Delete</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p>No replies yet.</p>
+                {% endfor %}
+                {% if comment.replies.count > 10 %}
+                    <p><a href="#" class="show-more-replies" data-comment-id="{{ comment.id }}">Show more replies</a></p>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>No comments yet.</p>
+    {% endfor %}
+</div>

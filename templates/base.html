@@ -64,18 +64,18 @@
 		</nav>
 		
 {% if user.is_authenticated %}
-    {% if user.is_staff %}
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button class="logout-button" type="submit">Log Out</button>|
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+		<a style="color: white;" href="{% url 'profile_edit' %}">Edit Profile</a>
+        <button class="logout-button" type="submit">Log Out</button>
+        {% if user.is_superuser %}
             <a style="color: white;" href="{% url 'blog:post_new' %}">New Post</a>
-        </form>
-    {% else %}
-        <a style="color: white;" href="{% url 'signup' %}">Sign Up</a> |
-        <a style="color: white;" href="{% url 'login' %}">Log In</a>
-    {% endif %}
+        {% endif %}
+    </form>
+{% else %}
+    <a style="color: white;" href="{% url 'signup' %}">Sign Up</a>&nbsp;&nbsp;&nbsp;
+    <a style="color: white;" href="{% url 'login' %}">Log In</a>
 {% endif %}
-
 		
 
     </header>
