@@ -10,9 +10,10 @@ from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse, HttpResponseForbidden
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
- 
+
 from .models import Post, Comment
 from .forms import CommentForm
 
@@ -45,17 +46,22 @@ class BlogDetail(DetailView, View):
         context['previous_post'] = Post.objects.filter(publish__lt=post.publish).order_by('-updated').first()
         context['next_post'] = Post.objects.filter(publish__gt=post.publish).order_by('updated').first()
         
-        # Get top-level comments ordered by creation date (newest first)
-        comments = post.comment_set.filter(parent=None).order_by('-created_at')  # Order by created_at descending
-        paginator = Paginator(comments, self.paginate_comments_by)  # Create a paginator
-        page_number = self.request.GET.get('page')  # Get the page number from the request
-        page_obj = paginator.get_page(page_number)  # Get the comments for the current page
+        # Get only approved top-level comments
+        comments = post.comment_set.filter(parent=None, is_approved=True).order_by('-created_at')
+        paginator = Paginator(comments, self.paginate_comments_by)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Add approved replies count to each comment
+        for comment in page_obj:
+            comment.approved_replies_count = comment.replies.filter(is_approved=True).count()
 
         context['comments'] = page_obj
-        context['page_obj'] = page_obj  # Pass the page object to the template
+        context['page_obj'] = page_obj
         context['form'] = CommentForm()
 
         return context
+
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -73,17 +79,31 @@ class BlogDetail(DetailView, View):
             comment = form.save(commit=False)
             comment.post = self.object
             comment.author = request.user  # Set the author to the logged-in user
+            comment.is_approved = False
             comment.save()
+            
+            # Check if it's a reply
+            parent_id = request.POST.get('parent')
+            if parent_id:
+                comment.parent_id = parent_id  # Set the parent if it's a reply
+
+            comment.save()
+
+            # Set the appropriate message based on whether it's a comment or a reply
+            if parent_id:
+                messages.success(request, 'Your reply is awaiting approval.')  # Reply message
+            else:
+                messages.success(request, 'Your comment is awaiting approval.')  # Comment message
+
             return JsonResponse({
                 'author': comment.author.username,
                 'comment': comment.comment,
                 'created_at': comment.created_at.strftime("%B %d, %Y, %I:%M %p"),
                 'parent': comment.parent.id if comment.parent else None,
                 'profile_image': comment.author.profile.profile_image.url,  # Assuming you have a Profile model
+                'message': 'Your comment is awaiting approval.',
             })
         return JsonResponse({'errors': form.errors}, status=400)
-
-
 
 
 class BlogCreate(LoginRequiredMixin, CreateView):
@@ -152,7 +172,7 @@ class CommentGet(DetailView):
         context["form"] = CommentForm()
         return context
 
-	
+    
 class CommentPost(SingleObjectMixin, FormView):
     model = Post
     form_class = CommentForm
@@ -175,15 +195,31 @@ class CommentPost(SingleObjectMixin, FormView):
 class CommentUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     fields = ['comment']
-    template_name = 'blog/comment_edit.html'  # Create this template
+    template_name = 'blog/comment_edit.html'
 
     def form_valid(self, form):
+        # Set the author and mark the comment as unapproved
         form.instance.author = self.request.user
+        form.instance.is_approved = False  # Require approval for the edited comment
+
+        # Check if it's a reply
+        parent_id = self.request.POST.get('parent')
+        if parent_id:
+            form.instance.parent_id = parent_id  # Set the parent if it's a reply
+
+        comment = form.save()  # Save the comment
+
+        messages.success(self.request, 'Your edit is awaiting approval.')  # Comment message
+
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # If the form is invalid, render the form with errors
+        return self.render_to_response({'form': form})
 
     def test_func(self):
         obj = self.get_object()
-        return obj.author == self.request.user
+        return obj.author == self.request.user  # Only allow the author to edit
 
     def get_success_url(self):
         return reverse('blog:blog_detail', kwargs={'slug': self.object.post.slug})
@@ -195,8 +231,26 @@ class CommentDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
     def get_success_url(self):
-        return reverse('blog:blog_detail', kwargs={'slug': self.object.post.slug})	
+        return reverse('blog:blog_detail', kwargs={'slug': self.object.post.slug})  
 
     def test_func(self):
         obj = self.get_object()
         return obj.author == self.request.user
+
+
+class CommentApprovalList(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Comment
+    template_name = "blog/comment_approval_list.html"
+
+    def get_queryset(self):
+        return Comment.objects.filter(is_approved=False)
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+class CommentApprove(View):
+    def post(self, request, pk):
+        comment = get_object_or_404(Comment, pk=pk)
+        comment.is_approved = True
+        comment.save()
+        return JsonResponse({'message': 'Comment approved.'})

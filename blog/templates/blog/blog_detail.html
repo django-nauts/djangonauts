@@ -6,7 +6,7 @@
 		    <div class="container">
 			    <header class="blog-post-header">
 				    <h2 class="title mb-2">{{ post.title }}</h2>
-				    <div class="meta mb-3"><span class="date">Published {{ post.publish }}</span><span class="time">Updated {{ post.updated }}</span><span class="comment"><a href="#">{{ post.comment_set.count }} Comment{{ post.comment_set.count|pluralize }}</a></span></div>
+				    <div class="meta mb-3"><span class="date">Published {{ post.publish }}</span><span class="time">Updated {{ post.updated }}</span><span class="comment"><a href="#comments-section">{{ post.comment_set.count }} Comment{{ post.comment_set.count|pluralize }}</a></span></div>
 			    </header>
 			    
 			    <div class="blog-post-body">
@@ -45,15 +45,22 @@
 				    {% endif %}
 				</nav>				
 
-
 <div class="blog-comments-section" id="comments-section">
     <h2>Comments</h2>
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+		
     <div class="comments-list" id="comments-list">
         {% for comment in comments %}
             <div class="comment">
                 {% if comment.author.profile.profile_image %}
                     <img src="{{ comment.author.profile.profile_image.url }}" alt="{{ comment.author.username }}'s profile image" id="profile-image">
-					{% else %}
+                {% else %}
                     <img src="{% static 'default_profile.png' %}" alt="Default profile image" id="profile-image">
                 {% endif %}
 
@@ -61,49 +68,67 @@
                 <h4>{{ comment.author }}:</h4>
                 <p>{{ comment.comment }}</p>
                 {% if comment.author == request.user %}
-				<a href="{% url 'blog:comment_edit' comment.id %}" style="display: inline-block; padding: 4px 8px; font-size: 12px; color: #000; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; text-decoration: none; cursor: pointer; margin-right: 5px;">Edit</a>
-				<a href="{% url 'blog:comment_delete' comment.id %}" class="delete-comment-button" data-comment-id="{{ comment.id }}" style="display: inline-block; padding: 4px 8px; font-size: 12px; color: #000; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; text-decoration: none; cursor: pointer;">Delete</a>
+                    <a href="{% url 'blog:comment_edit' comment.id %}" style="display: inline-block; padding: 4px 8px; font-size: 12px; color: #000; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; text-decoration: none; cursor: pointer; margin-right: 5px;">Edit</a>
+                    <a href="{% url 'blog:comment_delete' comment.id %}" class="delete-comment-button" data-comment-id="{{ comment.id }}" style="display: inline-block; padding: 4px 8px; font-size: 12px; color: #000; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; text-decoration: none; cursor: pointer;">Delete</a>
                 {% endif %}
                 
                 <div class="comment-meta">
                     <time class="comment-date">{{ comment.created_at|date:"F j, Y, g:i a" }}</time>
-					{% if user.is_authenticated %}
-                    <button class="reply-button btn-green" data-comment-id="{{ comment.id }}">Reply</button>
-					{% endif %}
+                    {% if user.is_authenticated %}
+                        <button class="reply-button btn-green" data-comment-id="{{ comment.id }}">Reply</button>
+                    {% endif %}
                 </div>
 
-<div class="reply-form" id="reply-form-{{ comment.id }}" style="display:none;">
-    <form class="reply-form" data-parent-id="{{ comment.id }}" action="{% url 'blog:blog_detail' slug=post.slug %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="reply-comment-{{ comment.id }}">Your Reply:</label>
-            <textarea id="reply-comment-{{ comment.id }}" name="comment" rows="4" required class="form-control"></textarea>
-        </div>
-        <input type="hidden" name="parent" value="{{ comment.id }}">
-        <button type="submit" class="btn-green">Submit Reply</button>
-    </form>
-</div>
-
+                <div class="reply-form" id="reply-form-{{ comment.id }}" style="display:none;">
+                    <form class="reply-form" data-parent-id="{{ comment.id }}" action="{% url 'blog:blog_detail' slug=post.slug %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="reply-comment-{{ comment.id }}">Your Reply:</label>
+                            <textarea id="reply-comment-{{ comment.id }}" name="comment" rows="4" required class="form-control"></textarea>
+                        </div>
+                        <input type="hidden" name="parent" value="{{ comment.id }}">
+						{{ form.captcha }}
+                        <button type="submit" class="btn-green">Submit Reply</button>
+                    </form>
+                </div>
 
                 <div class="replies">
-                    {% for reply in comment.replies.all|slice:":10" %}
-                        <div class="reply">
-                            {% if reply.author.profile.profile_image %}
-                                <img src="{{ reply.author.profile.profile_image.url }}" alt="{{ reply.author.username }}'s profile image" id="profile-image">
+                    {% with replies_count=comment.replies.count %}
+                        <span class="toggle-replies replies-count" data-comment-id="{{ comment.id }}">
+                            {% if comment.approved_replies_count == 0 %}
+                            No replies yet.
+                            {% elif comment.approved_replies_count == 1 %}
+                            <p style="cursor: pointer; text-decoration: underline;">1 reply >>></p>
                             {% else %}
-                                <img src="{% static 'default_profile.png' %}" alt="Default profile image" id="profile-image">
+                            <p style="cursor: pointer; text-decoration: underline;">{{ comment.approved_replies_count }} replies >>></p>
                             {% endif %}
-                            <p></p>
-                            <h5>{{ reply.author }}:</h5>
-                            <p>{{ reply.comment }}</p>
-                            <p><time class="reply-date comment-date">{{ reply.created_at|date:"F j, Y, g:i a" }}</time></p>
-                        </div>
-                    {% empty %}
-                        <p>No replies yet.</p>
-                    {% endfor %}
-                    {% if comment.replies.count > 10 %}
-                        <p><a href="#" class="show-more-replies" data-comment-id="{{ comment.id }}">Show more replies</a></p>
-                    {% endif %}
+                        </span>
+                    {% endwith %}
+                    <div class="replies-list" id="replies-list-{{ comment.id }}" style="display:none;">
+                        {% for reply in comment.replies.all %}
+						{% if reply.is_approved %}
+                            <div class="reply">
+                                {% if reply.author.profile.profile_image %}
+                                    <img src="{{ reply.author.profile.profile_image.url }}" alt="{{ reply.author.username }}'s profile image" id="profile-image">
+                                {% else %}
+                                    <img src="{% static 'default_profile.png' %}" alt="Default profile image" id="profile-image">
+                                {% endif %}
+                                <p></p>
+                                <h5>{{ reply.author }}:</h5>
+                                <p>{{ reply.comment }}</p>
+
+                                <!-- Add Edit and Delete buttons for replies -->
+                                {% if reply.author == request.user %}
+                                    <a href="{% url 'blog:comment_edit' reply.id %}" style="display: inline-block; padding: 4px 8px; font-size: 12px; color: #000; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; text-decoration: none; cursor: pointer; margin-right: 5px;">Edit</a>
+                                    <a href="{% url 'blog:comment_delete' reply.id %}" class="delete-comment-button" data-comment-id="{{ comment.id }}" style="display: inline-block; padding: 4px 8px; font-size: 12px; color: #000; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; text-decoration: none; cursor: pointer;">Delete</a>
+                                {% endif %}
+                                <p></p>
+                                <p><time class="reply-date comment-date">{{ reply.created_at|date:"F j, Y, g:i a" }}</time></p>
+                            </div>
+							{% endif %}
+                        {% empty %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         {% empty %}
@@ -112,25 +137,25 @@
     </div>
 </div>
 <br>
-    <!-- Pagination Controls -->
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?page=1#comments-section">&laquo; first</a>
-                <a href="?page={{ page_obj.previous_page_number }}#comments-section">previous</a>
-            {% endif %}
-			{% if comments %}
-			            <span class="current">
-			                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-			            </span>
-			{% endif %}
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}#comments-section">next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}#comments-section">last &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
-    <br>
+<!-- Pagination Controls -->
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1#comments-section">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}#comments-section">previous</a>
+        {% endif %}
+        {% if comments %}
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}#comments-section">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}#comments-section">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+<br>
 {% if user.is_authenticated %}
     <h3 class="mb-3">Write your comment</h3>
     <form id="comment-form" action="{% url 'blog:blog_detail' slug=post.slug %}" method="post" enctype="multipart/form-data">  <!-- Add enctype -->
@@ -138,88 +163,94 @@
         <div class="form-group">
             <label for="comment">Your Comment:</label>
             <textarea id="comment" name="comment" rows="4" required class="form-control"></textarea>
+			{{ form.captcha }}
         </div>
         <button type="submit" class="btn-green">Submit Comment</button>
     </form>
 </div>
 {% else %}
-			<p>Please <a href="{% url 'login' %}">log in</a> or <a href="{% url 'signup' %}">sign up</a> to comment or reply.</p>
+    <p>Please <a href="{% url 'login' %}">log in</a> or <a href="{% url 'signup' %}">sign up</a> to comment or reply.</p>
 {% endif %}
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        // Handle main comment form submission
-        $('#comment-form').on('submit', function(event) {
-            event.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: new FormData(this),  // Use FormData to handle file uploads
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    // Store the scroll position in localStorage
-                    localStorage.setItem('scrollToComments', 'true');
-                    // Refresh the page after successful submission
-                    location.reload(); // This simulates CTRL + R
-                },
-                error: function(xhr) {
-                    alert('Error: ' + xhr.responseJSON.errors.comment[0]);
-                }
-            });
+$(document).ready(function() {
+    // Handle main comment form submission
+    $('#comment-form').on('submit', function(event) {
+        event.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: new FormData(this),  // Use FormData to handle file uploads
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // Store the scroll position in localStorage
+                localStorage.setItem('scrollToComments', 'true');
+                // Refresh the page after successful submission
+                location.reload(); // This simulates CTRL + R
+            },
+            error: function(xhr) {
+                alert('Error: ' + xhr.responseJSON.errors.comment[0]);
+            }
         });
-
-        // Handle reply form submission
-        $(document).on('submit', '.reply-form', function(event) {
-            event.preventDefault();
-            var parentId = $(this).data('parent-id');
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: new FormData(this),  // Use FormData to handle file uploads
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    // Store the scroll position in localStorage
-                    localStorage.setItem('scrollToComments', 'true');
-                    // Refresh the page after successful reply submission
-                    location.reload(); // This simulates CTRL + R
-                },
-                error: function(xhr) {
-                    alert('Error: ' + xhr.responseJSON.errors.comment[0]);
-                }
-            });
-        });
-
-        // Handle reply button click
-        $(document).on('click', '.reply-button', function() {
-            var commentId = $(this).data('comment-id');
-            $('#reply-form-' + commentId).toggle(); // Toggle the reply form
-        });
-
-        // Remove hash from URL on page load
-        if (window.location.hash) {
-            history.replaceState("", document.title, window.location.pathname + window.location.search);
-        }
-
-        // Check localStorage for scroll position
-        if (localStorage.getItem('scrollToComments') === 'true') {
-            // Scroll to the comments section smoothly
-            document.querySelector("#comments-section").scrollIntoView({ behavior: "smooth" });
-            // Clear the scroll position from localStorage
-            localStorage.removeItem('scrollToComments');
-        }
     });
 
-    document.addEventListener("DOMContentLoaded", function() {
-        // Check if the URL has a hash
-        if (window.location.hash === "#comments-section") {
-            // Scroll to the comment section smoothly
-            document.querySelector("#comments-section").scrollIntoView({ behavior: "smooth" });
-        }
+    // Handle reply form submission
+    $(document).on('submit', '.reply-form', function(event) {
+        event.preventDefault();
+        var parentId = $(this).data('parent-id');
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: new FormData(this),  // Use FormData to handle file uploads
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // Store the scroll position in localStorage
+                localStorage.setItem('scrollToComments', 'true');
+                // Refresh the page after successful reply submission
+                location.reload(); // This simulates CTRL + R
+            },
+            error: function(xhr) {
+                alert('Error: ' + xhr.responseJSON.errors.comment[0]);
+            }
+        });
     });
+
+    // Handle reply button click
+    $(document).on('click', '.reply-button', function() {
+        var commentId = $(this).data('comment-id');
+        $('#reply-form-' + commentId).toggle(); // Toggle the reply form
+    });
+
+    // Handle toggle replies text click
+    $(document).on('click', '.toggle-replies', function() {
+        var commentId = $(this).data('comment-id');
+        $('#replies-list-' + commentId).toggle(); // Toggle the replies list
+    });
+
+    // Remove hash from URL on page load
+    if (window.location.hash) {
+        history.replaceState("", document.title, window.location.pathname + window.location.search);
+    }
+
+    // Check localStorage for scroll position
+    if (localStorage.getItem('scrollToComments') === 'true') {
+        // Scroll to the comments section smoothly
+        document.querySelector("#comments-section").scrollIntoView({ behavior: "smooth" });
+        // Clear the scroll position from localStorage
+        localStorage.removeItem('scrollToComments');
+    }
+
+    // Check if the URL has a hash
+    if (window.location.hash === "#comments-section") {
+        // Scroll to the comment section smoothly
+        document.querySelector("#comments-section").scrollIntoView({ behavior: "smooth" });
+    }
+});
 </script>
+
 				
 		    </div><!--//container-->
 	    </article>

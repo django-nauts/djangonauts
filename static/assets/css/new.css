@@ -155,4 +155,22 @@ button:hover {
     margin-right: 10px;  /* Space between image and text */
 }
 
+.no-replies {
+    color: #888; /* Gray color for "No replies yet" */
+    font-style: italic; /* Italic style for a modern touch */
+    margin-right: 10px; /* Space to the right */
+}
 
+.reply-count {
+    color: #27AE60; /* Green color for replies count */
+    font-weight: bold; /* Bold text for emphasis */
+    cursor: pointer; /* Keep cursor pointer for replies count */
+    text-decoration: none; /* No underline */
+    padding: 5px; /* Padding for better spacing */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+.reply-count:hover {
+    background-color: rgba(39, 174, 96, 0.1); /* Light green background on hover */
+}

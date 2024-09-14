@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
 	# External apps
 	'taggit',
+	'captcha',
 ]
 
 MIDDLEWARE = [

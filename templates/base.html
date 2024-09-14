@@ -66,7 +66,7 @@
 {% if user.is_authenticated %}
     <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
-		<a style="color: white;" href="{% url 'profile_edit' %}">Edit Profile</a>
+		<a style="color: white;" href="{% url 'profile_edit' %}">Profile</a>
         <button class="logout-button" type="submit">Log Out</button>
         {% if user.is_superuser %}
             <a style="color: white;" href="{% url 'blog:post_new' %}">New Post</a>

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Pending Comments for Approval</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Author</th>
+            <th>Comment</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for comment in object_list %}
+        <tr>
+            <td>{{ comment.author.username }}</td>
+            <td>{{ comment.comment }}</td>
+            <td>
+                <form method="post" action="{% url 'blog:comment_approve' comment.pk %}">
+                    {% csrf_token %}
+                    <button type="submit">Approve</button>
+                </form>
+            </td>
+        </tr>
+        {% for reply in comment.replies.all %}
+        <tr>
+            <td>&nbsp;&nbsp;&nbsp;{{ reply.author.username }}</td>
+            <td>&nbsp;&nbsp;&nbsp;{{ reply.comment }}</td>
+            <td>
+                <form method="post" action="{% url 'blog:comment_approve' reply.pk %}">
+                    {% csrf_token %}
+                    <button type="submit">Approve</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        {% empty %}
+        <tr>
+            <td colspan="3">No comments pending approval.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
