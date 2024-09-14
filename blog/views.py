@@ -121,19 +121,6 @@ class BlogCreate(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class BlogUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Post
-    template_name = "blog/post_edit.html"
-    fields = ["title", "slug", "body", "cover", "tags"]
-
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
-    def test_func(self):
-        obj = self.get_object()
-        return obj.author == self.request.user
-
 
 class BlogUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post

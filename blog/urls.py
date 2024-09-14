@@ -10,7 +10,7 @@ from .views import (
 	CommentUpdate,
 	CommentDelete,
 	CommentApprovalList,
-    CommentApprove
+    CommentApprove,
 )
 
 app_name = 'blog'

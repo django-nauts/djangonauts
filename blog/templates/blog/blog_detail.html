@@ -20,7 +20,7 @@
 					{% endif %}					  
 					
 				    <p>
-					  {{ post.body }}
+					  {{ post.body|safe }}
 					</p>
 					
 			    </div>
@@ -87,6 +87,7 @@
                             <textarea id="reply-comment-{{ comment.id }}" name="comment" rows="4" required class="form-control"></textarea>
                         </div>
                         <input type="hidden" name="parent" value="{{ comment.id }}">
+						<p><p>Please complete the CAPTCHA below to verify you are not a robot.</p></p>
 						{{ form.captcha }}
                         <button type="submit" class="btn-green">Submit Reply</button>
                     </form>
@@ -163,8 +164,10 @@
         <div class="form-group">
             <label for="comment">Your Comment:</label>
             <textarea id="comment" name="comment" rows="4" required class="form-control"></textarea>
+			<br>
+			<p>Please complete the CAPTCHA below to verify you are not a robot.</p>
 			{{ form.captcha }}
-        </div>
+        </div>	  
         <button type="submit" class="btn-green">Submit Comment</button>
     </form>
 </div>

@@ -12,7 +12,7 @@
 					    <div class="media-body">
 						    <h3 class="title mb-1"><a href="{{ post.get_absolute_url }}">{{ post.title | slice:"50" }}</a></h3>
 						    <div class="meta mb-1"><span class="date">Published {{ post.publish }}</span><span class="time">Updated {{ post.updated }}</span></div>
-						    <div class="intro">{{ post.body | slice:"300" }}...</div>
+						    <div class="intro">{{ post.body|safe | slice:"300" }}...</div>
 						    <a class="more-link" href="{{ post.get_absolute_url }}">Read more &rarr;</a>
 					    </div><!--//media-body-->
 				    </div><!--//media-->
