@@ -11,6 +11,7 @@ from .views import (
 	CommentDelete,
 	CommentApprovalList,
     CommentApprove,
+	upload_image,
 )
 
 app_name = 'blog'
@@ -30,4 +31,5 @@ urlpatterns = [
     path('reply/<int:pk>/delete/', CommentDelete.as_view(), name='reply_delete'),
 	path('comments/approve/', CommentApprovalList.as_view(), name='comment_approval_list'),
     path('comment/<int:pk>/approve/', CommentApprove.as_view(), name='comment_approve'),
+	path('upload-image/', upload_image, name='upload_image'),
 ]

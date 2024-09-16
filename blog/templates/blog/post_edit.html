@@ -33,22 +33,93 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    // Initialize Quill editor
-    var quill = new Quill('#editor', {
-        theme: 'snow'
-    });
+// Initialize Quill editor
+var quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: {
+        toolbar: [
+            [{ 'header': [1, 2, false] }], // Headers
+            ['bold', 'italic', 'underline'], // Formatting
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }], // Ordered and Unordered Lists
+            ['link', 'image', 'video'], // Links, Images, Videos
+            [{ 'color': [] }, { 'background': [] }], // Text color and background color
+            [{ 'align': [] }], // Text alignment
+            ['clean'], // Remove formatting button
+            ['blockquote', 'code-block'], // Block quotes and code blocks
+            ['table'], // Table insertion
+            ['undo', 'redo'], // Undo and redo
+            ['emoji'] // Emoji support
+        ]
+    }
+});
 
-    // Set the initial content of the editor
-    quill.root.innerHTML = '{{ post.body|safe }}'; // Ensure this is set correctly
+// Custom handler for image uploads
+quill.getModule('toolbar').addHandler('image', function() {
+    var input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
 
-    // Handle form submission
-    $('form').on('submit', function(event) {
-        // Get HTML content from Quill editor
-        var bodyContent = quill.root.innerHTML;
-        // Set the hidden input value
-        $('#body').val(bodyContent);
-        console.log("Body content:", bodyContent); // Log the content for debugging
+    input.onchange = () => {
+        var file = input.files[0];
+        var formData = new FormData();
+        formData.append('image', file);
+
+        // Send the image to the server
+        $.ajax({
+            url: '/upload-image/', // URL to your image upload view
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // Prompt for image size
+                var width = prompt("Enter image width (px):", "300");
+                var height = prompt("Enter image height (px):", "300");
+
+                // Insert the image with specified dimensions
+                var range = quill.getSelection();
+                var img = `<img src="${response.image_url}" width="${width}" height="${height}" style="max-width: 100%; height: auto;" />`;
+                quill.clipboard.dangerouslyPasteHTML(range.index, img);
+            },
+            error: function() {
+                console.error('Image upload failed.');
+            }
+        });
+    };
+});
+
+// Handle form submission
+$('form').on('submit', function(event) {
+    var bodyContent = quill.root.innerHTML;
+    $('#body').val(bodyContent);
+});
+
+// Save drafts to local storage
+setInterval(function() {
+    var content = quill.root.innerHTML;
+    localStorage.setItem('draft', content);
+}, 5000); // Save every 5 seconds
+
+// Load draft from local storage
+window.onload = function() {
+    var draft = localStorage.getItem('draft');
+    if (draft) {
+        quill.root.innerHTML = draft;
+    }
+};
+
+// Export to PDF functionality
+function exportToPDF() {
+    var doc = new jsPDF();
+    doc.fromHTML(quill.root.innerHTML, 15, 15, {
+        'width': 170
     });
+    doc.save('document.pdf');
+}
+
+// Add event listener for export button
+document.getElementById('export-btn').addEventListener('click', exportToPDF);
 </script>
 
 {% endblock content %}

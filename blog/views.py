@@ -13,6 +13,8 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import FileSystemStorage
 
 from .models import Post, Comment
 from .forms import CommentForm
@@ -235,9 +237,21 @@ class CommentApprovalList(LoginRequiredMixin, UserPassesTestMixin, ListView):
     def test_func(self):
         return self.request.user.is_superuser
 
+
 class CommentApprove(View):
     def post(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         comment.is_approved = True
         comment.save()
         return JsonResponse({'message': 'Comment approved.'})
+
+
+@csrf_exempt
+def upload_image(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        image = request.FILES['image']
+        fs = FileSystemStorage()
+        filename = fs.save(image.name, image)
+        image_url = fs.url(filename)
+        return JsonResponse({'image_url': image_url})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
