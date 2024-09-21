@@ -25,6 +25,9 @@ class BlogList(ListView):
     template_name = "blog/blog_list.html"
     paginate_by = 5
 
+    def get_queryset(self):
+        return Post.objects.filter(published=True)
+
 
 class BlogCategory(ListView):
     model = Post

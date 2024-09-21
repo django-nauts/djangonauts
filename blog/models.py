@@ -11,12 +11,13 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     cover = models.ImageField(upload_to='images/', default='default.jpg')
     title = models.CharField(max_length=200, blank=False, null=False)
-    slug = models.SlugField(blank=False, null=False, unique=True)
+    slug = models.SlugField(max_length=200, blank=False, null=False, unique=True)
     body = models.TextField(blank=False, null=False)
     tags = TaggableManager(blank=True)
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    published = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-updated']

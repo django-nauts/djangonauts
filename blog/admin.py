@@ -20,16 +20,17 @@ class CommentAdmin(admin.ModelAdmin):
         self.message_user(request, f"{queryset.count()} comments approved.")
     approve_comments.short_description = "Approve selected comments"
 
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'author', 'publish']
-    list_filter = ['created', 'publish', 'author']
-    search_fields = ['title', 'body']  # Changed 'comment' to 'body'
+    list_display = ('title', 'author', 'published', 'created', 'updated')
+    list_filter = ('published', 'created', 'updated')
+    search_fields = ('title', 'body')
     prepopulated_fields = {'slug': ('title',)}
     raw_id_fields = ['author']
     date_hierarchy = 'publish'
     ordering = ['-updated']
-    inlines = [CommentInline]  # Add this line
+    inlines = [CommentInline]
 
 # Register the Comment model with the CommentAdmin class
 admin.site.register(Comment, CommentAdmin)
