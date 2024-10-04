@@ -55,13 +55,23 @@
 }
 
 .comment {
-    border-bottom: 1px solid #d1d1d1;
-    padding: 15px 0; /* Increased padding for better spacing */
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px; /* Space between comments */
+    background-color: #ffffff; /* White background for comments */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: box-shadow 0.3s ease; /* Smooth shadow transition */
+}
+
+.comment:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
 }
 
 .comment h4 {
     margin: 0;
     color: #4CAF50;
+    font-size: 1.2em; /* Slightly larger font for comments */
 }
 
 .comment-meta {
@@ -81,16 +91,29 @@
 
 .replies {
     margin-top: 15px; /* Adds space above replies */
+    padding-left: 20px; /* Indent replies */
+    border-left: 2px solid #d1d1d1; /* Left border for visual separation */
 }
 
 .reply {
-    border-top: 1px solid #d1d1d1;
-    padding: 10px 0; /* Adds padding for replies */
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px; /* Space between replies */
+    background-color: #f9f9f9; /* Light gray background for replies */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for replies */
+    transition: box-shadow 0.3s ease; /* Smooth shadow transition */
+}
+
+.reply:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
 }
 
 .reply h5 {
     margin: 0;
     color: #4CAF50;
+    font-weight: normal; /* Normal weight for replies */
+    font-size: 1em; /* Slightly smaller font for replies */
 }
 
 .form-group {
@@ -122,4 +145,32 @@ button {
 
 button:hover {
     background-color: #45a049;
+}
+
+#profile-image {
+    width: 50px;  /* Fixed width */
+    height: 50px; /* Fixed height */
+    border-radius: 50%;  /* Make it circular */
+    object-fit: cover; /* Ensures the image covers the area without distortion */
+    margin-right: 10px;  /* Space between image and text */
+}
+
+.no-replies {
+    color: #888; /* Gray color for "No replies yet" */
+    font-style: italic; /* Italic style for a modern touch */
+    margin-right: 10px; /* Space to the right */
+}
+
+.reply-count {
+    color: #27AE60; /* Green color for replies count */
+    font-weight: bold; /* Bold text for emphasis */
+    cursor: pointer; /* Keep cursor pointer for replies count */
+    text-decoration: none; /* No underline */
+    padding: 5px; /* Padding for better spacing */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+.reply-count:hover {
+    background-color: rgba(39, 174, 96, 0.1); /* Light green background on hover */
 }

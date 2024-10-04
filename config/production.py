@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-75$7^wu+ilhv^68^vg*b88v7!&qcv1l$@p@j_#3grst=sro)td
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'djangonauts.me']
+ALLOWED_HOSTS = ['djangonauts.me', 'www.djangonauts.me', 'https://djangonauts.me']
 
 # Use SECURE_* Settings for HTTPS 
 SECURE_SSL_REDIRECT = True
