@@ -9,5 +9,5 @@ DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1', 'djangonauts.me', 'www.djangonauts.me', 'https://djangonauts.me']
 
 # Change media address based on your website
-MEDIA_ROOT = "/home/djangona/djangonauts/media.djangonauts.me/"
+MEDIA_ROOT = "/home/djangona/djangonauts/media"
 MEDIA_URL = "https://media.djangonauts.me/"
