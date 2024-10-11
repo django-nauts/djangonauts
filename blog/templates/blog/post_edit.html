@@ -16,9 +16,16 @@
 
             <div class="form-group">
                 <label for="body">Body:</label>
+                <!-- Toggle HTML Editing Mode Button -->
+                <button type="button" id="toggle-html" class="btn btn-secondary">Switch to HTML</button>
+                
                 <!-- Quill editor container -->
                 <div id="editor" style="height: 200px;">{{ post.body|safe }}</div>
-                <!-- Hidden input to store the Quill editor content -->
+                
+                <!-- Hidden textarea to store raw HTML when switching modes -->
+                <textarea id="html-editor" style="display: none; width: 100%; height: 200px;"></textarea>
+                
+                <!-- Hidden input to store the final Quill content -->
                 <input type="hidden" name="body" id="body" required>
             </div>
 
@@ -38,76 +45,53 @@ var quill = new Quill('#editor', {
     theme: 'snow',
     modules: {
         toolbar: [
-            [{ 'header': [1, 2, false] }], // Headers
-            ['bold', 'italic', 'underline'], // Formatting
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }], // Ordered and Unordered Lists
-            ['link', 'image', 'video'], // Links, Images, Videos
-            [{ 'color': [] }, { 'background': [] }], // Text color and background color
-            [{ 'align': [] }], // Text alignment
-            ['clean'], // Remove formatting button
-            ['blockquote', 'code-block'], // Block quotes and code blocks
-            ['table'], // Table insertion
-            ['undo', 'redo'], // Undo and redo
-            ['emoji'] // Emoji support
+            [{ 'header': [1, 2, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['link', 'image', 'video'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'align': [] }],
+            ['clean'],
+            ['blockquote', 'code-block'],
+            ['table'],
+            ['undo', 'redo'],
+            ['emoji']
         ]
     }
 });
 
-// Custom handler for image uploads
-quill.getModule('toolbar').addHandler('image', function() {
-    var input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
+var isHtmlMode = false;
 
-    input.onchange = () => {
-        var file = input.files[0];
-        var formData = new FormData();
-        formData.append('image', file);
-
-        // Send the image to the server
-        $.ajax({
-            url: '/upload-image/', // URL to your image upload view
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                // Prompt for image size
-                var width = prompt("Enter image width (px):", "300");
-                var height = prompt("Enter image height (px):", "300");
-
-                // Insert the image with specified dimensions
-                var range = quill.getSelection();
-                var img = `<img src="${response.image_url}" width="${width}" height="${height}" style="max-width: 100%; height: auto;" />`;
-                quill.clipboard.dangerouslyPasteHTML(range.index, img);
-            },
-            error: function() {
-                console.error('Image upload failed.');
-            }
-        });
-    };
+// Toggle between Quill and HTML editor
+$('#toggle-html').on('click', function() {
+    if (isHtmlMode) {
+        // Switch back to Quill mode
+        var htmlContent = $('#html-editor').val();
+        quill.clipboard.dangerouslyPasteHTML(htmlContent);
+        $('#editor').show();
+        $('#html-editor').hide();
+        $(this).text('Switch to HTML');
+    } else {
+        // Switch to HTML mode
+        var quillContent = quill.root.innerHTML;
+        $('#html-editor').val(quillContent);
+        $('#editor').hide();
+        $('#html-editor').show();
+        $(this).text('Switch to Quill');
+    }
+    isHtmlMode = !isHtmlMode;
 });
 
 // Handle form submission
 $('form').on('submit', function(event) {
-    var bodyContent = quill.root.innerHTML;
-    $('#body').val(bodyContent);
-});
-
-// Save drafts to local storage
-setInterval(function() {
-    var content = quill.root.innerHTML;
-    localStorage.setItem('draft', content);
-}, 5000); // Save every 5 seconds
-
-// Load draft from local storage
-window.onload = function() {
-    var draft = localStorage.getItem('draft');
-    if (draft) {
-        quill.root.innerHTML = draft;
+    var bodyContent;
+    if (isHtmlMode) {
+        bodyContent = $('#html-editor').val(); // Get content from HTML editor
+    } else {
+        bodyContent = quill.root.innerHTML; // Get content from Quill
     }
-};
+    $('#body').val(bodyContent); // Set the hidden input's value
+});
 
 // Export to PDF functionality
 function exportToPDF() {
